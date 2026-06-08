@@ -566,7 +566,7 @@ export default function StudioPage() {
       setAnalyser(analyserNode);
 
       const mimeType =
-        ["audio/webm;codecs=opus", "audio/mp4", "audio/ogg;codecs=opus", "audio/webm"].find(
+        ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg"].find(
           (t) => { try { return MediaRecorder.isTypeSupported(t); } catch { return false; } }
         ) || "";
 
