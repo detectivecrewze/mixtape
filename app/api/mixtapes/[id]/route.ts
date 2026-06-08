@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getMixtape, deleteMixtape, putMixtape } from "@/lib/kv";
 import { verifySession } from "@/lib/auth";
 
+export const dynamic = 'force-dynamic';
+
 interface Params {
   params: Promise<{ id: string }>;
 }

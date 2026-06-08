@@ -88,6 +88,7 @@ export async function DELETE(req: NextRequest) {
   const id = searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
 
+  await deleteToken(id);
   await deleteToken(id.toUpperCase());
   return NextResponse.json({ success: true });
 }

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifySession } from "@/lib/auth";
+
+export const dynamic = 'force-dynamic';
 import { listMixtapes, getMixtape, putMixtape, getToken, putToken } from "@/lib/kv";
 
 function unauthorized() {
@@ -47,7 +49,40 @@ export async function POST(req: NextRequest) {
   if (isNew) {
     const tokenId = data.bundleToken as string | undefined;
 
-    // Path 1: Admin session — always allowed, no token needed
+    // Path 1: Bundle token provided — must be valid and have remaining quota
+    if (tokenId) {
+      const token = await getToken(tokenId.toUpperCase());
+
+      if (!token) {
+        return NextResponse.json({ error: "Bundle token tidak ditemukan." }, { status: 403 });
+      }
+
+      if (token.remainingQuota <= 0) {
+        return NextResponse.json(
+          { error: "Kuota bundle token sudah habis." },
+          { status: 403 }
+        );
+      }
+
+      // Deduct quota and link mixtapeId to the token
+      await putToken(token.id, {
+        ...token,
+        remainingQuota: token.remainingQuota - 1,
+        mixtapes: [...token.mixtapes, id],
+      });
+
+      // Save mixtape with token reference
+      await putMixtape(id, {
+        ...data,
+        bundleToken: token.id,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+
+      return NextResponse.json({ success: true, id });
+    }
+
+    // Path 2: No token provided — requires Admin session
     if (await verifySession(req)) {
       // Admin creates freely, no token deduction
       await putMixtape(id, {
@@ -58,43 +93,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: true, id });
     }
 
-    // Path 2: Bundle token — must be valid and have remaining quota
-    if (!tokenId) {
-      return NextResponse.json(
-        { error: "Mixtape not found. A valid bundle token is required to create a new mixtape." },
-        { status: 403 }
-      );
-    }
-
-    const token = await getToken(tokenId.toUpperCase());
-
-    if (!token) {
-      return NextResponse.json({ error: "Bundle token tidak ditemukan." }, { status: 403 });
-    }
-
-    if (token.remainingQuota <= 0) {
-      return NextResponse.json(
-        { error: "Kuota bundle token sudah habis." },
-        { status: 403 }
-      );
-    }
-
-    // Deduct quota and link mixtapeId to the token
-    await putToken(token.id, {
-      ...token,
-      remainingQuota: token.remainingQuota - 1,
-      mixtapes: [...token.mixtapes, id],
-    });
-
-    // Save mixtape with token reference
-    await putMixtape(id, {
-      ...data,
-      bundleToken: token.id,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-
-    return NextResponse.json({ success: true, id });
+    return NextResponse.json(
+      { error: "Mixtape not found. A valid bundle token or admin session is required to create a new mixtape." },
+      { status: 403 }
+    );
   }
 
   // Existing mixtape — anyone with the link can update (studio autosave)
