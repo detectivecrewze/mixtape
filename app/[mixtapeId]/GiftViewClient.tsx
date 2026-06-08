@@ -116,6 +116,7 @@ export default function GiftViewClient({
 
   const mixerCtxRef = useRef<AudioContext | null>(null);
   const voiceAudioRef = useRef<HTMLAudioElement | null>(null);
+  const voiceTimeRef = useRef<number>(0);
   const mixerAmbientAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Set initial unlock state
@@ -137,6 +138,8 @@ export default function GiftViewClient({
       va.src = voiceUrl + (voiceUrl.includes("?") ? "&" : "?") + "cb=" + Date.now();
       // Apply volume (works on Desktop, iOS forces 1.0 but background music will be ducked)
       va.volume = activeConfig.voiceVolume ?? 1.0;
+      va.style.display = "none";
+      document.body.appendChild(va);
       voiceAudioRef.current = va;
     }
 
@@ -166,13 +169,21 @@ export default function GiftViewClient({
     setHasStarted(true);
     await initAudio();
     // Start both audios
-    voiceAudioRef.current?.play().catch(() => {});
+    if (voiceAudioRef.current) {
+      if (voiceTimeRef.current > 0 && voiceAudioRef.current.currentTime === 0) {
+        voiceAudioRef.current.currentTime = voiceTimeRef.current;
+      }
+      voiceAudioRef.current.play().catch(() => {});
+    }
     mixerAmbientAudioRef.current?.play().catch(() => {});
   };
 
   const handlePause = () => {
     setIsPlaying(false);
-    voiceAudioRef.current?.pause();
+    if (voiceAudioRef.current) {
+      voiceTimeRef.current = voiceAudioRef.current.currentTime;
+      voiceAudioRef.current.pause();
+    }
     mixerAmbientAudioRef.current?.pause();
   };
 
@@ -443,6 +454,7 @@ export default function GiftViewClient({
             photos={activeConfig.photos}
             note={activeConfig.note}
             isPlaying={isPlaying}
+            hasStarted={hasStarted}
           />
         </motion.div>
 

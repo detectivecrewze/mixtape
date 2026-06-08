@@ -13,6 +13,7 @@ interface CassetteCaseProps {
   note?: string;
   className?: string;
   isPlaying?: boolean;
+  hasStarted?: boolean;
 }
 
 export default function CassetteCase({
@@ -20,6 +21,7 @@ export default function CassetteCase({
   note = "",
   className = "",
   isPlaying = false,
+  hasStarted = false,
 }: CassetteCaseProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
@@ -151,7 +153,7 @@ export default function CassetteCase({
           </motion.div>
 
           {/* Idle State Overlay (PRESS PLAY) */}
-          {!isPlaying && (
+          {!hasStarted && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0c0d11] z-10 pointer-events-none">
               <div className="w-8 h-px bg-[rgba(180,200,230,0.2)]" />
               <p 
