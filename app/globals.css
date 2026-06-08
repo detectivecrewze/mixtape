@@ -1,26 +1,66 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-space-mono: 'Space Mono', monospace;
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-caveat: 'Caveat', cursive;
+
+  --bg-studio: #aec6cf;
+  --color-primary: #111111;
+  --color-secondary: #888888;
+  --color-success: #4caf50;
+  --color-card: #ffffff;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter);
+  color: var(--color-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Utility: hide scrollbar but keep scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ruled lines for note textarea */
+.ruled-paper {
+  background-color: #fdfdf5;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 27px,
+    #c8d9f0 27px,
+    #c8d9f0 28px
+  );
+  background-size: 100% 28px;
+  line-height: 28px;
+}
+
+/* Cassette case glassmorphism */
+.cassette-case {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px) saturate(1.2);
+  -webkit-backdrop-filter: blur(4px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    0 8px 32px rgba(0, 0, 0, 0.18);
 }

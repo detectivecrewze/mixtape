@@ -1,0 +1,8 @@
+.reelSpin {
+  animation: reelSpin 1.8s linear infinite;
+}
+
+@keyframes reelSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

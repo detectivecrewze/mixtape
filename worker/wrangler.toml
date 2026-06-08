@@ -1,0 +1,19 @@
+name = "mixtape-worker"
+main = "src/index.ts"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# Singapore region
+[placement]
+mode = "smart"
+
+[[kv_namespaces]]
+binding = "MIXTAPE_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+[vars]
+APP_URL = "https://mixtape.for-you-always.my.id"
+
+# Spotify credentials — set via dashboard or wrangler secret
+# wrangler secret put SPOTIFY_CLIENT_ID
+# wrangler secret put SPOTIFY_CLIENT_SECRET

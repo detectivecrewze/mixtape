@@ -1,0 +1,49 @@
+{
+  "dreamy-serenade-229": {
+    "color": "#8AB0AB",
+    "photos": [
+      {
+        "url": "/uploads/dreamy-serenade-229/photos/1780868354879.jpg",
+        "caption": "Be there always."
+      },
+      {
+        "url": "/uploads/dreamy-serenade-229/photos/1780868354900.jpg",
+        "caption": ""
+      },
+      {
+        "url": "/uploads/dreamy-serenade-229/photos/1780868354910.jpg",
+        "caption": ""
+      },
+      {
+        "url": "/uploads/dreamy-serenade-229/photos/1780868354925.jpg",
+        "caption": ""
+      }
+    ],
+    "note": "Hello!!",
+    "voiceNote": {
+      "url": "/uploads/unknown/audio/1780868687060.webm",
+      "duration": 32,
+      "mimeType": "audio/mpeg"
+    },
+    "backsound": {
+      "url": "https://arcade-edition.aldoramadhan16.workers.dev/files/1773903992490-jk4w6.mp3",
+      "title": "AH",
+      "artist": "Nadin Amizah"
+    },
+    "voiceVolume": 0.75,
+    "ambientVolume": 0.25,
+    "password": "123",
+    "passwordHint": "Our First Date?",
+    "mixtapeId": "dreamy-serenade-229",
+    "updatedAt": "2026-06-08T06:56:55.608Z",
+    "status": "published",
+    "publishedAt": "2026-06-08T06:56:55.375Z"
+  },
+  "auto-jr9d4tl": {
+    "mixtapeId": "auto-jr9d4tl",
+    "status": "draft",
+    "color": "#A2C4C9",
+    "createdAt": "2026-06-07T22:03:10.051Z",
+    "updatedAt": "2026-06-07T22:03:10.146Z"
+  }
+}
