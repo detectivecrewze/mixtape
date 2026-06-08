@@ -774,7 +774,7 @@ export default function StudioPage() {
     if (voiceUrl) {
       const va = new Audio();
       va.crossOrigin = "anonymous";
-      va.src = voiceUrl;
+      va.src = voiceUrl + (voiceUrl.includes("?") ? "&" : "?") + "cb=" + Date.now();
       const src = ctx.createMediaElementSource(va);
       const gain = ctx.createGain();
       gain.gain.setValueAtTime(0, ctx.currentTime);
@@ -788,7 +788,7 @@ export default function StudioPage() {
     if (ambientUrl) {
       const aa = new Audio();
       aa.crossOrigin = "anonymous";
-      aa.src = ambientUrl;
+      aa.src = ambientUrl + (ambientUrl.includes("?") ? "&" : "?") + "cb=" + Date.now();
       aa.loop = true;
       const src2 = ctx.createMediaElementSource(aa);
       const gain2 = ctx.createGain();
