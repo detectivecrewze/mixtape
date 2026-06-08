@@ -290,6 +290,7 @@ export default function StudioPage() {
 
   // ── Main state ──────────────────────────────────────────────────────────────
   const [isInitializing, setIsInitializing] = useState(true);
+  const [isNotFound, setIsNotFound] = useState(false);
   const [st, setSt] = useState<StudioState>({
     color: CASSETTE_COLORS[0].hex,
     photos: [],
@@ -309,6 +310,10 @@ export default function StudioPage() {
     async function loadExisting() {
       try {
         const res = await fetch(`/api/mixtapes/${mixtapeId}`);
+        if (res.status === 404) {
+          setIsNotFound(true);
+          return;
+        }
         if (res.ok) {
           const data = await res.json();
           setSt({
@@ -1655,6 +1660,34 @@ export default function StudioPage() {
         <p className="mt-4 text-xs tracking-widest font-bold uppercase" style={{ color: "#111", fontFamily: "var(--font-space-mono)" }}>
           Loading Studio...
         </p>
+      </main>
+    );
+  }
+
+  if (isNotFound) {
+    return (
+      <main
+        className="min-h-screen flex flex-col items-center justify-center py-16 px-4 text-center"
+        style={{ background: bgColor, transition: "background 0.5s ease" }}
+      >
+        <h1 className="text-4xl font-bold mb-4" style={{ fontFamily: "var(--font-space-mono)", color: "#111" }}>404</h1>
+        <p className="text-sm font-bold uppercase tracking-widest mb-8" style={{ color: "rgba(0,0,0,0.5)", fontFamily: "var(--font-space-mono)" }}>
+          Mixtape Not Found
+        </p>
+        <p className="text-md max-w-md" style={{ color: "#111", fontFamily: "var(--font-space-mono)" }}>
+          The studio link you entered is invalid or the mixtape hasn't been created yet. Only admins can create new mixtapes from the dashboard.
+        </p>
+        <a 
+          href="/"
+          className="mt-8 py-3 px-6 rounded-xl font-bold text-sm tracking-wider transition-all active:scale-95 flex items-center justify-center gap-2"
+          style={{
+            fontFamily: "var(--font-space-mono)",
+            background: "#111",
+            color: "white",
+          }}
+        >
+          Go to Homepage
+        </a>
       </main>
     );
   }

@@ -1,9 +1,8 @@
 import { redirect } from "next/navigation";
 
 /**
- * Root page — redirects straight to the studio wizard for testing.
- * In production, swap this for a marketing/landing page.
+ * Root page — redirects to the published mixtape gift view.
  */
 export default function HomePage() {
-  redirect("/studio/demo");
+  redirect("/dreamy-serenade-229");
 }

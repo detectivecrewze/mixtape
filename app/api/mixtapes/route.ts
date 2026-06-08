@@ -30,7 +30,9 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(list.filter(Boolean));
 }
 
-// POST /api/mixtapes — create or update a mixtape (public — whoever has studio link)
+// POST /api/mixtapes — create or update a mixtape
+// Creating a NEW mixtape requires admin session.
+// Updating an EXISTING mixtape is allowed for anyone with the studio link.
 export async function POST(req: NextRequest) {
   const data = (await req.json()) as Record<string, unknown>;
   const id = data.mixtapeId as string | undefined;
@@ -39,6 +41,16 @@ export async function POST(req: NextRequest) {
   }
 
   const existing = await getMixtape(id) as Record<string, any> | null;
+
+  // If mixtape doesn't exist yet, only admin can create it
+  if (!existing) {
+    if (!(await verifySession(req))) {
+      return NextResponse.json(
+        { error: "Mixtape not found. Only admin can create new mixtapes." },
+        { status: 403 }
+      );
+    }
+  }
 
   await putMixtape(id, {
     ...existing,
