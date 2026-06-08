@@ -23,7 +23,7 @@ export default function FloatingFlowers() {
 
   // Generate 60 flowers with slightly reduced sizes to find the sweet spot
   const flowers = useMemo(() => {
-    return Array.from({ length: 60 }).map((_, i) => ({
+    return Array.from({ length: 17 }).map((_, i) => ({
       id: i,
       left: `${Math.random() * 100}%`,
       size: Math.random() * 25 + 14, // 14px to 39px
