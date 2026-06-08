@@ -12,6 +12,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import CassettePlayer from "@/components/mixtape/CassettePlayer";
 import NoteCard from "@/components/mixtape/NoteCard";
 import { CASSETTE_COLORS, PASTEL_MAP, type CassetteColorId } from "@/lib/constants";
+import { QRCodeCanvas } from "qrcode.react";
+import * as htmlToImage from "html-to-image";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function getColorId(hex: string): CassetteColorId {
@@ -287,6 +289,7 @@ export default function StudioPage() {
   const [giftUrl, setGiftUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState("");
+  const qrRef = useRef<HTMLDivElement>(null);
 
   // ── Main state ──────────────────────────────────────────────────────────────
   const [isInitializing, setIsInitializing] = useState(true);
@@ -304,6 +307,29 @@ export default function StudioPage() {
     password: "",
     passwordHint: "",
   });
+
+  const downloadQRCode = useCallback(async () => {
+    if (!qrRef.current) {
+      alert("Element not ready yet");
+      return;
+    }
+    try {
+      const bgColor = PASTEL_MAP[getColorId(st.color)] || "#f3f4f6";
+      const pngUrl = await htmlToImage.toPng(qrRef.current, { 
+        pixelRatio: 2,
+        backgroundColor: bgColor, // Force the pastel background behind the glassmorphism
+      });
+      const downloadLink = document.createElement("a");
+      downloadLink.href = pngUrl;
+      downloadLink.download = `${mixtapeId}-gift-card.png`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    } catch (err: any) {
+      console.error("Failed to generate image", err);
+      alert("Failed to save image: " + err.message);
+    }
+  }, [mixtapeId, st.color]);
 
   // ── Fetch existing data ─────────────────────────────────────────────────────
   useEffect(() => {
@@ -1469,6 +1495,64 @@ export default function StudioPage() {
             <p className="text-xs text-black/50" style={{ fontFamily: "var(--font-space-mono)" }}>
               Share this link with someone special:
             </p>
+
+            {/* ── Aesthetic Gift Card (Downloadable) ── */}
+            <div className="w-full flex flex-col items-center gap-4">
+              {/* The actual element that gets downloaded */}
+              <div 
+                ref={qrRef} 
+                className="p-8 flex flex-col items-center justify-center w-full max-w-[320px]"
+                style={{ backgroundColor: PASTEL_MAP[getColorId(st.color)] || "#f3f4f6" }}
+              >
+                <div className="w-full p-8 rounded-[2rem] flex flex-col items-center justify-center gap-6 bg-white/60 backdrop-blur-xl shadow-2xl border border-white/60">
+                  {/* 1. Cassette Graphic */}
+                  <div className="transform scale-90 sm:scale-100 mt-2">
+                    <CassettePlayer color={st.color} isPlaying={false} size="sm" className="drop-shadow-xl" />
+                  </div>
+                  
+                  {/* 2. Text */}
+                  <div className="text-center w-full">
+                  <h3 className="text-sm font-bold tracking-widest text-black/80 uppercase" style={{ fontFamily: "var(--font-space-mono)" }}>
+                    A Mixtape For You
+                  </h3>
+                  <p className="text-[10px] uppercase tracking-wider text-black/50 mt-1 font-bold">
+                    Scan to listen
+                  </p>
+                </div>
+
+                {/* 3. Aesthetic Barcode */}
+                <div className="bg-white p-3 rounded-2xl shadow-sm border border-black/5 mb-2">
+                  <QRCodeCanvas
+                    value={giftUrl || "https://for-you-always.my.id"}
+                    size={120}
+                    bgColor={"#ffffff"}
+                    fgColor={st.color || "#000000"} 
+                    level={"H"}
+                    imageSettings={{
+                      src: "/assets/cassete.png",
+                      height: 24,
+                      width: 36,
+                      excavate: true,
+                    }}
+                  />
+                </div>
+              </div>
+              </div>
+
+              {/* Download Button */}
+              <button
+                onClick={downloadQRCode}
+                className="text-xs font-bold uppercase tracking-wider text-black/50 hover:text-black transition-colors flex items-center gap-2 mt-2"
+                style={{ fontFamily: "var(--font-space-mono)" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Save Gift Card
+              </button>
+            </div>
 
             <div className="w-full p-4 rounded-xl bg-white border border-black/10">
               <input
