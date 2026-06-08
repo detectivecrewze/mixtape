@@ -11,7 +11,13 @@ import { useParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import CassettePlayer from "@/components/mixtape/CassettePlayer";
 import NoteCard from "@/components/mixtape/NoteCard";
-import { CASSETTE_COLORS } from "@/lib/constants";
+import { CASSETTE_COLORS, PASTEL_MAP, type CassetteColorId } from "@/lib/constants";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function getColorId(hex: string): CassetteColorId {
+  const found = CASSETTE_COLORS.find((c) => c.hex === hex);
+  return (found?.id ?? "blue") as CassetteColorId;
+}
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const WORKER = "https://valentine-upload.aldoramadhan16.workers.dev";
@@ -1634,11 +1640,13 @@ export default function StudioPage() {
   );
 
   // ── Main Render ─────────────────────────────────────────────────────────────
+  const bgColor = st.color ? PASTEL_MAP[getColorId(st.color)] : "#c9dff0";
+
   if (isInitializing) {
     return (
       <main
         className="min-h-screen flex flex-col items-center justify-center py-16 px-4"
-        style={{ background: "#c9dff0" }}
+        style={{ background: bgColor, transition: "background 0.5s ease" }}
       >
         <div
           className="w-10 h-10 border-4 rounded-full animate-spin"
@@ -1654,7 +1662,7 @@ export default function StudioPage() {
   return (
     <main
       className="min-h-screen flex flex-col items-center justify-start py-16 px-4 overflow-y-auto"
-      style={{ background: "#c9dff0" }}
+      style={{ background: bgColor, transition: "background 0.5s ease" }}
     >
       {/* Toast */}
       <AnimatePresence>
