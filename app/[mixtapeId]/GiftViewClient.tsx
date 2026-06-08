@@ -83,6 +83,28 @@ export default function GiftViewClient({
   const colorId = getColorId(activeConfig.color);
   const bgColor = PASTEL_MAP[colorId] ?? "#c8d9f0";
 
+  // Sync iOS status bar & body background to gift theme color
+  useEffect(() => {
+    // Set body background (fixes home indicator / bottom safe area)
+    document.body.style.backgroundColor = bgColor;
+
+    // Set theme-color meta (fixes iOS status bar top)
+    let meta = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
+    if (!meta) {
+      meta = document.createElement("meta") as HTMLMetaElement;
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+    meta.content = bgColor;
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.backgroundColor = "";
+      const m = document.querySelector('meta[name="theme-color"]') as HTMLMetaElement | null;
+      if (m) m.content = "";
+    };
+  }, [bgColor]);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
 
