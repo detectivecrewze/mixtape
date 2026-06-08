@@ -34,6 +34,8 @@ export interface MixtapeGiftConfig {
   photos: PhotoConfig[];
   voiceNote?: VoiceConfig;
   backsound?: BacksoundConfig;
+  voiceVolume?: number;
+  ambientVolume?: number;
   stickers?: string[];
   recipientName?: string;
   password?: string;
