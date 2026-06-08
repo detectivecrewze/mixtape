@@ -937,10 +937,10 @@ export default function StudioPage() {
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 gap-3 max-h-[420px] overflow-y-auto pr-1">
+                <div className="grid grid-cols-2 gap-3 max-h-[420px] overflow-y-auto pr-1 auto-rows-max">
                   {st.photos.map((photo, idx) => (
-                    <div key={photo.id} className="flex flex-col rounded-xl overflow-hidden border border-black/10 bg-white shadow-sm">
-                      <div className="relative aspect-square bg-gray-100">
+                    <div key={photo.id} className="flex flex-col rounded-xl overflow-hidden border border-black/10 bg-white shadow-sm h-full">
+                      <div className="relative aspect-square w-full shrink-0 bg-gray-100">
                         {photo.status === "uploading" && (
                           <div className="absolute inset-0 flex flex-col items-center justify-center">
                             <div className="w-5 h-5 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
