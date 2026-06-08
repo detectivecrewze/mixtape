@@ -995,7 +995,7 @@ export default function StudioPage() {
                           style={{ fontFamily: "var(--font-caveat)", fontSize: "13px" }}
                           placeholder="Add a caption..."
                           rows={2}
-                          maxLength={100}
+                          maxLength={45}
                           value={photo.caption}
                           onChange={(e) => updateCaption(photo.id, e.target.value)}
                         />
@@ -1155,7 +1155,7 @@ export default function StudioPage() {
             )}
 
             <p className="text-center text-xs text-black/30 mt-4" style={{ fontFamily: "var(--font-space-mono)" }}>
-              (Optional — skip if you prefer no voice)
+              <span className="font-bold opacity-70">(Optional — skip if you prefer no voice)</span>
             </p>
           </motion.div>
         );
@@ -1360,7 +1360,7 @@ export default function StudioPage() {
             </div>
 
             <p className="text-center text-xs text-black/30 mt-3" style={{ fontFamily: "var(--font-space-mono)" }}>
-              (Optional — your mixtape works without music too)
+              <span className="font-bold opacity-70">(Optional — your mixtape works without music too)</span>
             </p>
           </motion.div>
         );
@@ -1372,23 +1372,10 @@ export default function StudioPage() {
             <StepTitle>Protect Your Gift</StepTitle>
             <p className="text-center text-xs text-black/40 mb-5" style={{ fontFamily: "var(--font-space-mono)" }}>
               Add a password so only they can open it<br />
-              <span className="opacity-60">(Optional — leave blank to skip)</span>
+              <span className="font-bold opacity-70 text-black/70">(Optional — leave blank to skip)</span>
             </p>
 
             <div className="space-y-3">
-              <div>
-                <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/40 block mb-1" style={{ fontFamily: "var(--font-space-mono)" }}>
-                  Password
-                </label>
-                <input
-                  type="text"
-                  value={st.password}
-                  onChange={(e) => update({ password: e.target.value.replace(/\s/g, "") })}
-                  placeholder="e.g. ourfirstdate"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-black/15 text-sm outline-none focus:border-black/40 transition-colors"
-                  style={{ fontFamily: "var(--font-space-mono)" }}
-                />
-              </div>
               <div>
                 <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/40 block mb-1" style={{ fontFamily: "var(--font-space-mono)" }}>
                   Hint (shown on password screen)
@@ -1399,6 +1386,19 @@ export default function StudioPage() {
                   onChange={(e) => update({ passwordHint: e.target.value })}
                   placeholder="e.g. The day we first met..."
                   className="w-full px-4 py-3 rounded-xl bg-white border border-black/15 text-sm outline-none focus:border-black/40 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/40 block mb-1" style={{ fontFamily: "var(--font-space-mono)" }}>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={st.password}
+                  onChange={(e) => update({ password: e.target.value.replace(/\s/g, "") })}
+                  placeholder="e.g. ourfirstdate"
+                  className="w-full px-4 py-3 rounded-xl bg-white border border-black/15 text-sm outline-none focus:border-black/40 transition-colors"
+                  style={{ fontFamily: "var(--font-space-mono)", letterSpacing: st.password ? "0.2em" : "normal" }}
                 />
               </div>
             </div>

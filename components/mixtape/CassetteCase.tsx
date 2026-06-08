@@ -128,16 +128,19 @@ export default function CassetteCase({
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 
+                {/* Dark Gradient Overlay for Caption Readability */}
+                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+                
                 {/* Subtitle scrolling WITH the photo */}
                 <div
                   className="absolute bottom-3 left-0 right-0 flex justify-center px-4"
                 >
                   <p
-                    className="text-white text-center leading-tight drop-shadow-md"
+                    className="text-white text-center leading-tight drop-shadow-lg font-bold tracking-wide"
                     style={{
                       fontFamily: "var(--font-caveat)",
-                      fontSize: "1.05rem",
-                      textShadow: "1px 1px 2px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.8)",
+                      fontSize: "0.85rem",
+                      textShadow: "2px 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.8)",
                     }}
                   >
                     {photo.caption}

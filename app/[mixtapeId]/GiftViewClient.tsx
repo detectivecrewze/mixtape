@@ -36,6 +36,8 @@ export interface MixtapeGiftConfig {
   backsound?: BacksoundConfig;
   stickers?: string[];
   recipientName?: string;
+  password?: string;
+  passwordHint?: string;
   createdAt?: string;
 }
 
@@ -58,6 +60,8 @@ const MOCKUP_CONFIG: MixtapeGiftConfig = {
     url: "",
     volume: 0.25,
   },
+  password: "test",
+  passwordHint: "the word is test",
 };
 
 // ── Helper ───────────────────────────────────────────────────────────────────
@@ -81,8 +85,20 @@ export default function GiftViewClient({
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+
   const voiceRef = useRef<HTMLAudioElement | null>(null);
   const backsoundRef = useRef<HTMLAudioElement | null>(null);
+
+  // Set initial unlock state
+  useEffect(() => {
+    if (!activeConfig.password) {
+      setIsUnlocked(true);
+    }
+  }, [activeConfig.password]);
 
   // Initialise audio when config is ready
   useEffect(() => {
@@ -131,9 +147,134 @@ export default function GiftViewClient({
         className="min-h-screen relative flex flex-col items-center justify-start pb-36 px-4"
         style={{ paddingTop: "40px" }}
       >
-        <FloatingFlowers />
+        {/* ── Retro Cassette Lock Screen ────────────────────────────────── */}
+        <AnimatePresence>
+          {!isUnlocked && (
+            <motion.div
+              key="lock-screen"
+              initial={{ opacity: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, filter: "blur(0px)" }}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              style={{ background: "rgba(255,255,255,0.05)" }}
+            >
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ scale: 1.1, opacity: 0, filter: "blur(10px)" }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="transform scale-[0.85] sm:scale-100 origin-center"
+              >
+                <div className="relative inline-block">
+                  {/* 1. The Actual Cassette (Blurred Behind) */}
+                  <div className="relative" style={{ zIndex: 1 }}>
+                    <CassettePlayer
+                      color={activeConfig.color}
+                      isPlaying={false}
+                      size="lg"
+                      className="opacity-90 block"
+                    />
+                  </div>
+                  
+                  {/* 2. The Frosted Glass Case Overlay */}
+                  <div 
+                    className="absolute inset-0 overflow-hidden"
+                    style={{
+                      zIndex: 2,
+                      borderRadius: "16px",
+                      background: "linear-gradient(135deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.15) 100%)",
+                      backdropFilter: "blur(8px)",
+                      borderTop: "1.5px solid rgba(255,255,255,0.7)",
+                      borderLeft: "1.5px solid rgba(255,255,255,0.7)",
+                      borderRight: "1px solid rgba(255,255,255,0.3)",
+                      borderBottom: "1px solid rgba(255,255,255,0.3)",
+                      boxShadow: "inset 0 0 20px rgba(255,255,255,0.3), 0 20px 40px rgba(0,0,0,0.15)"
+                    }}
+                  >
+                    {/* Subtle mist effect texture */}
+                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/dust.png')" }}></div>
+                    
+                    {/* TOP: Label */}
+                    <div className="absolute top-12 left-0 w-full flex justify-center z-10 pointer-events-none">
+                      <div className="px-4 py-1.5 rounded-sm bg-white/70 shadow-sm border border-white/50">
+                        <p className="text-[10px] font-bold tracking-[0.25em] text-black/70 uppercase whitespace-nowrap" style={{ fontFamily: "var(--font-space-mono)" }}>
+                          Gift is Locked
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* MIDDLE: Form & Input */}
+                    <div className="absolute inset-0 z-10 w-full flex flex-col items-center justify-center pointer-events-none">
+                      <form 
+                        id="unlock-form"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (passwordInput === activeConfig.password) {
+                            setIsUnlocked(true);
+                          } else {
+                            setPasswordError(true);
+                          }
+                        }} 
+                        className="w-full flex flex-col items-center pointer-events-auto"
+                      >
+                        <div className="relative w-full px-2 flex flex-col items-center">
+                          <input
+                            type="password"
+                            placeholder="Ketik sandi di sini..."
+                            value={passwordInput}
+                            onChange={(e) => {
+                              setPasswordInput(e.target.value);
+                              setPasswordError(false);
+                            }}
+                            className={`w-[85%] max-w-[320px] bg-white/50 border-[1.5px] border-black/20 backdrop-blur-md pb-2 pt-3 rounded-2xl shadow-inner text-center text-3xl font-bold text-black/80 placeholder-black/50 focus:outline-none transition-colors ${passwordError ? "border-red-400 bg-red-100/80" : "focus:border-black/40 focus:bg-white/70"}`}
+                            style={{ fontFamily: "var(--font-caveat)", letterSpacing: "0.05em" }}
+                          />
+                          {passwordError && (
+                            <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute -bottom-6 w-full text-center text-[11px] text-red-600 font-bold tracking-wider uppercase drop-shadow-sm">
+                              Sandi Salah
+                            </motion.span>
+                          )}
+                          {activeConfig.passwordHint && !passwordError && (
+                            <p className="absolute -bottom-7 w-full text-center text-xs text-black/80 font-bold tracking-widest drop-shadow-sm" style={{ fontFamily: "var(--font-space-mono)" }}>
+                              Hint: {activeConfig.passwordHint}
+                            </p>
+                          )}
+                        </div>
+                      </form>
+                    </div>
 
-        <div className="w-full max-w-sm flex flex-col items-center gap-0">
+                    {/* BOTTOM: Button */}
+                    <div className="absolute bottom-4 left-0 w-full flex justify-center z-10 pointer-events-none">
+                      <button
+                        type="submit"
+                        form="unlock-form"
+                        disabled={!passwordInput}
+                        className="pointer-events-auto px-8 py-3 rounded-full text-xs font-bold tracking-[0.2em] text-white transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 shadow-xl whitespace-nowrap"
+                        style={{ background: "#111", fontFamily: "var(--font-space-mono)" }}
+                      >
+                        OPEN GIFT
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Main Content Area */}
+        <div 
+          className="relative w-full flex flex-col items-center transition-all duration-[1200ms] z-10"
+          style={{ 
+            opacity: isUnlocked ? 1 : 0, 
+            pointerEvents: isUnlocked ? "auto" : "none",
+            filter: isUnlocked ? "blur(0px)" : "blur(12px)",
+            transform: isUnlocked ? "scale(1)" : "scale(0.95)"
+          }}
+        >
+          <FloatingFlowers />
+
+          <div className="w-full max-w-sm flex flex-col items-center gap-0">
 
 
 
@@ -250,6 +391,7 @@ export default function GiftViewClient({
         </motion.div>
 
         <div style={{ height: "20vh", minHeight: "150px" }} aria-hidden="true" />
+        </div>
       </div>
     </main>
     </>
