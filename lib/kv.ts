@@ -125,3 +125,76 @@ export async function deleteMixtape(id: string): Promise<void> {
   delete store[id];
   writeLocal(store);
 }
+
+// ── Token (Bundle) helpers ────────────────────────────────────────────────────
+
+export interface BundleToken {
+  id: string;
+  remainingQuota: number;
+  totalQuota: number;
+  mixtapes: string[]; // list of mixtapeIds created with this token
+  createdAt: string;
+  label?: string; // optional buyer label for admin reference
+}
+
+const TOKEN_LOCAL_FILE = () => path.join(process.cwd(), "data", "tokens.json");
+
+function readLocalTokens(): Record<string, BundleToken> {
+  const fp = TOKEN_LOCAL_FILE();
+  if (!fs.existsSync(fp)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(fp, "utf-8"));
+  } catch {
+    return {};
+  }
+}
+
+function writeLocalTokens(data: Record<string, BundleToken>): void {
+  const fp = TOKEN_LOCAL_FILE();
+  fs.mkdirSync(path.dirname(fp), { recursive: true });
+  fs.writeFileSync(fp, JSON.stringify(data, null, 2));
+}
+
+export async function listTokens(): Promise<string[]> {
+  if (isKVConfigured()) {
+    const index = await kvGet("token:_index");
+    return Array.isArray(index) ? (index as string[]) : [];
+  }
+  return Object.keys(readLocalTokens());
+}
+
+export async function getToken(id: string): Promise<BundleToken | null> {
+  if (isKVConfigured()) {
+    const data = await kvGet(`token:${id}`);
+    return data ? (data as BundleToken) : null;
+  }
+  const store = readLocalTokens();
+  return store[id] ?? null;
+}
+
+export async function putToken(id: string, data: BundleToken): Promise<void> {
+  if (isKVConfigured()) {
+    await kvPut(`token:${id}`, data);
+    const index = await listTokens();
+    if (!index.includes(id)) {
+      await kvPut("token:_index", [...index, id]);
+    }
+    return;
+  }
+  const store = readLocalTokens();
+  store[id] = data;
+  writeLocalTokens(store);
+}
+
+export async function deleteToken(id: string): Promise<void> {
+  if (isKVConfigured()) {
+    await kvDelete(`token:${id}`);
+    const index = await listTokens();
+    await kvPut("token:_index", index.filter((x) => x !== id));
+    return;
+  }
+  const store = readLocalTokens();
+  delete store[id];
+  writeLocalTokens(store);
+}
+

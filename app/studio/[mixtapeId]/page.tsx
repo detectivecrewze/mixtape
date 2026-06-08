@@ -7,7 +7,7 @@ import React, {
   useEffect,
   useReducer,
 } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import CassettePlayer from "@/components/mixtape/CassettePlayer";
 import NoteCard from "@/components/mixtape/NoteCard";
@@ -283,6 +283,8 @@ function WaveformBars({ analyser }: { analyser: AnalyserNode | null }) {
 export default function StudioPage() {
   const params = useParams<{ mixtapeId: string }>();
   const mixtapeId = params?.mixtapeId ?? "";
+  const searchParams = useSearchParams();
+  const bundleToken = searchParams?.get("token") ?? null;
 
   const [step, setStep] = useState(1);
   const [isPublishing, setIsPublishing] = useState(false);
@@ -855,7 +857,12 @@ export default function StudioPage() {
       const res = await fetch("/api/mixtapes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mixtapeId, ...payload }),
+        body: JSON.stringify({
+          mixtapeId,
+          ...payload,
+          // Pass bundle token so the API can deduct quota (only matters for new mixtapes)
+          ...(bundleToken ? { bundleToken: bundleToken.toUpperCase() } : {}),
+        }),
       });
       const result = await res.json();
       if (!result.success) throw new Error();
