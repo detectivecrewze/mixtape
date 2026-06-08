@@ -1180,8 +1180,8 @@ export default function StudioPage() {
               </div>
             )}
 
-            <p className="text-center text-xs text-black/30 mt-4" style={{ fontFamily: "var(--font-space-mono)" }}>
-              <span className="font-bold opacity-70">(Optional — skip if you prefer no voice)</span>
+            <p className="text-center text-xs text-black/40 mt-4" style={{ fontFamily: "var(--font-space-mono)" }}>
+              (<span className="font-black text-black/80">Optional</span> — skip if you prefer no voice)
             </p>
           </motion.div>
         );
@@ -1410,7 +1410,7 @@ export default function StudioPage() {
                   type="text"
                   value={st.passwordHint}
                   onChange={(e) => update({ passwordHint: e.target.value })}
-                  placeholder="e.g. The day we first met..."
+                  placeholder="e.g. My favorite food"
                   className="w-full px-4 py-3 rounded-xl bg-white border border-black/15 text-sm outline-none focus:border-black/40 transition-colors"
                 />
               </div>
@@ -1422,7 +1422,7 @@ export default function StudioPage() {
                   type="password"
                   value={st.password}
                   onChange={(e) => update({ password: e.target.value.replace(/\s/g, "") })}
-                  placeholder="e.g. ourfirstdate"
+                  placeholder="e.g. sushi"
                   className="w-full px-4 py-3 rounded-xl bg-white border border-black/15 text-sm outline-none focus:border-black/40 transition-colors"
                   style={{ fontFamily: "var(--font-space-mono)", letterSpacing: st.password ? "0.2em" : "normal" }}
                 />
@@ -1627,7 +1627,7 @@ export default function StudioPage() {
     step === TOTAL_STEPS ? "Publish" : undefined;
 
   // ── Song Library Modal ──────────────────────────────────────────────────────
-  const LibraryModal = () => (
+  const renderLibraryModal = (
     <AnimatePresence>
       {showLibrary && (
         <motion.div
@@ -1791,7 +1791,7 @@ export default function StudioPage() {
         )}
       </AnimatePresence>
 
-      <LibraryModal />
+      {renderLibraryModal}
 
       <div className="w-full max-w-[440px]">
         {/* Header */}
