@@ -537,7 +537,7 @@ export default function AdminPage() {
               </div>
             ) : filteredMixtapes.length === 0 ? (
               <div className="text-center py-20 bg-[#16161a] rounded-2xl border border-white/5">
-                <div className="text-white/30 mb-4 flex justify-center"><IconTape className="w-12 h-12" strokeWidth="1" /></div>
+                <div className="text-white/30 mb-4 flex justify-center"><IconTape className="w-12 h-12" /></div>
                 <h3 className="text-lg font-semibold text-white/90">Belum ada mixtape</h3>
                 <p className="text-sm text-white/40 mt-1">Buat mixtape pertama Anda dengan tombol + New</p>
               </div>
