@@ -775,14 +775,9 @@ export default function StudioPage() {
       const va = new Audio();
       va.crossOrigin = "anonymous";
       va.src = voiceUrl + (voiceUrl.includes("?") ? "&" : "?") + "cb=" + Date.now();
-      const src = ctx.createMediaElementSource(va);
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      src.connect(gain);
-      gain.connect(ctx.destination);
-      voiceGainRef.current = gain;
+      va.volume = st.voiceVolume; // Apply standard volume
       mixerVoiceAudioRef.current = va;
-      va.play().then(() => gain.gain.setTargetAtTime(st.voiceVolume, ctx.currentTime, 0.1)).catch(() => {});
+      va.play().catch(() => {});
     }
 
     if (ambientUrl) {

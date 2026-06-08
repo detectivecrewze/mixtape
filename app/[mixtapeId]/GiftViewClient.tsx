@@ -90,8 +90,9 @@ export default function GiftViewClient({
   const [passwordInput, setPasswordInput] = useState("");
   const [passwordError, setPasswordError] = useState(false);
 
-  const voiceRef = useRef<HTMLAudioElement | null>(null);
-  const backsoundRef = useRef<HTMLAudioElement | null>(null);
+  const mixerCtxRef = useRef<AudioContext | null>(null);
+  const voiceAudioRef = useRef<HTMLAudioElement | null>(null);
+  const mixerAmbientAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Set initial unlock state
   useEffect(() => {
@@ -100,34 +101,65 @@ export default function GiftViewClient({
     }
   }, [activeConfig.password]);
 
-  // Initialise audio when config is ready
-  useEffect(() => {
-    if (activeConfig.voiceNote?.url) {
-      voiceRef.current = new Audio(activeConfig.voiceNote.url);
-    }
-    if (activeConfig.backsound?.url) {
-      backsoundRef.current = new Audio(activeConfig.backsound.url);
-      backsoundRef.current.loop = true;
-      backsoundRef.current.volume = activeConfig.backsound.volume ?? 0.25;
-    }
-    return () => {
-      voiceRef.current?.pause();
-      backsoundRef.current?.pause();
-    };
-  }, [activeConfig]);
+  // Initialise audio context when play is clicked (required by iOS Safari)
+  const initAudio = async () => {
+    const voiceUrl = activeConfig.voiceNote?.url;
+    const ambientUrl = activeConfig.backsound?.url;
 
-  const handlePlay = () => {
+    // 1. Voice Note - Standard HTMLAudioElement (Bypasses iOS WebKit WebM + WebAudio Bug)
+    if (voiceUrl && !voiceAudioRef.current) {
+      const va = new Audio();
+      va.crossOrigin = "anonymous";
+      va.src = voiceUrl + (voiceUrl.includes("?") ? "&" : "?") + "cb=" + Date.now();
+      // Apply volume (works on Desktop, iOS forces 1.0 but background music will be ducked)
+      va.volume = activeConfig.voiceVolume ?? 1.0;
+      voiceAudioRef.current = va;
+    }
+
+    // 2. Background Music - Web Audio API (Allows precise volume control on iOS)
+    if (ambientUrl && !mixerAmbientAudioRef.current) {
+      if (!mixerCtxRef.current) {
+        mixerCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = mixerCtxRef.current;
+      if (ctx.state === "suspended") await ctx.resume();
+
+      const aa = new Audio();
+      aa.crossOrigin = "anonymous";
+      aa.src = ambientUrl + (ambientUrl.includes("?") ? "&" : "?") + "cb=" + Date.now();
+      aa.loop = true;
+      const src2 = ctx.createMediaElementSource(aa);
+      const gain2 = ctx.createGain();
+      gain2.gain.value = activeConfig.ambientVolume ?? 0.25;
+      src2.connect(gain2);
+      gain2.connect(ctx.destination);
+      mixerAmbientAudioRef.current = aa;
+    }
+  };
+
+  const handlePlay = async () => {
     setIsPlaying(true);
     setHasStarted(true);
-    voiceRef.current?.play().catch(() => {});
-    backsoundRef.current?.play().catch(() => {});
+    await initAudio();
+    // Start both audios
+    voiceAudioRef.current?.play().catch(() => {});
+    mixerAmbientAudioRef.current?.play().catch(() => {});
   };
 
   const handlePause = () => {
     setIsPlaying(false);
-    voiceRef.current?.pause();
-    backsoundRef.current?.pause();
+    voiceAudioRef.current?.pause();
+    mixerAmbientAudioRef.current?.pause();
   };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      voiceAudioRef.current?.pause();
+      mixerAmbientAudioRef.current?.pause();
+      mixerCtxRef.current?.close().catch(() => {});
+    };
+  }, []);
 
   return (
     <>
