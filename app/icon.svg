@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Cassette Body -->
+  <rect x="4" y="12" width="56" height="40" rx="4" fill="#75c2c9" />
+  <!-- Sticker -->
+  <rect x="8" y="16" width="48" height="24" rx="2" fill="#f4f4f4" />
+  <rect x="12" y="18" width="40" height="6" fill="#e89e5d" />
+  <!-- Spools Area -->
+  <rect x="14" y="26" width="36" height="12" rx="6" fill="#333" />
+  <!-- Left Spool -->
+  <circle cx="22" cy="32" r="4" fill="#f4f4f4" />
+  <circle cx="22" cy="32" r="1.5" fill="#333" />
+  <!-- Right Spool -->
+  <circle cx="42" cy="32" r="4" fill="#f4f4f4" />
+  <circle cx="42" cy="32" r="1.5" fill="#333" />
+  <!-- Tape line between spools -->
+  <line x1="26" y1="32" x2="38" y2="32" stroke="#f4f4f4" stroke-width="1.5" />
+  <!-- Bottom Trapezoid Area -->
+  <path d="M16 52 L20 44 L44 44 L48 52 Z" fill="#5ea5ac" />
+  <!-- Small bottom holes -->
+  <circle cx="24" cy="48" r="1.5" fill="#333" />
+  <circle cx="40" cy="48" r="1.5" fill="#333" />
+  <!-- Details -->
+  <circle cx="8" cy="48" r="1.5" fill="#333" />
+  <circle cx="56" cy="48" r="1.5" fill="#333" />
+</svg>
