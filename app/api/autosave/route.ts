@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { putMixtape } from "@/lib/kv";
+import { putMixtape, getMixtape } from "@/lib/kv";
 
 /**
  * POST /api/autosave?id=<mixtapeId>
