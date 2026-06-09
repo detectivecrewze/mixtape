@@ -354,11 +354,9 @@ export default function GiftViewClient({
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.12 }}
             style={{ marginBottom: "-0.5rem" }} // Pull cassette up to overlap
           >
-            <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
-              <div style={{ width: "100%", maxWidth: 290 }}>
-                <NoteCard value={activeConfig.note} readOnly={true} />
-              </div>
-            </motion.div>
+            <div style={{ width: "100%", maxWidth: 290 }}>
+              <NoteCard value={activeConfig.note} readOnly={true} />
+            </div>
           </motion.div>
         )}
 
