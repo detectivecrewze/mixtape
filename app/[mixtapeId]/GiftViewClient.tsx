@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import CassettePlayer from "@/components/mixtape/CassettePlayer";
 import CassetteCase from "@/components/mixtape/CassetteCase";
+import MusicCard from "@/components/mixtape/MusicCard";
 import NoteCard from "@/components/mixtape/NoteCard";
 import FloatingFlowers from "@/components/mixtape/FloatingFlowers";
 import { PASTEL_MAP, CASSETTE_COLORS } from "@/lib/constants";
@@ -24,6 +25,7 @@ export interface BacksoundConfig {
   title: string;
   artist: string;
   url: string;
+  coverUrl?: string;
   volume?: number;
 }
 
@@ -58,9 +60,9 @@ const MOCKUP_CONFIG: MixtapeGiftConfig = {
   voiceNote: undefined, // will be added later
   backsound: {
     title: "Everything u are",
-    artist: "Hindia",
-    url: "",
-    volume: 0.25,
+    artist: "daniella",
+    url: "/assets/demo-song.mp3",
+    coverUrl: "https://i.scdn.co/image/ab67616d0000b273d70eb0e2fc1f4dae7e6e73cb",
   },
   password: "test",
   passwordHint: "the word is test",
@@ -109,6 +111,8 @@ export default function GiftViewClient({
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [musicTime, setMusicTime] = useState(0);
+  const [musicDuration, setMusicDuration] = useState(0);
 
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
@@ -160,6 +164,10 @@ export default function GiftViewClient({
       gain2.gain.value = activeConfig.ambientVolume ?? 0.25;
       src2.connect(gain2);
       gain2.connect(ctx.destination);
+      
+      aa.addEventListener('timeupdate', () => setMusicTime(aa.currentTime));
+      aa.addEventListener('loadedmetadata', () => setMusicDuration(aa.duration));
+      
       mixerAmbientAudioRef.current = aa;
     }
   };
@@ -376,8 +384,26 @@ export default function GiftViewClient({
           </motion.div>
         </motion.div>
 
-        {/* ── Play / Pause button ───────────────────────────────── */}
-        <motion.div
+        {/* ── Play / Pause Control ───────────────────────────────── */}
+        {activeConfig.backsound ? (
+          <motion.div
+            className="w-full relative z-10"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.35 }}
+          >
+            <MusicCard
+              title={activeConfig.backsound.title}
+              artist={activeConfig.backsound.artist}
+              coverUrl={activeConfig.backsound.coverUrl}
+              currentTime={musicTime}
+              duration={musicDuration}
+              isPlaying={isPlaying}
+              onPlayPause={isPlaying ? handlePause : handlePlay}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
           className="flex flex-col items-center gap-2 mt-4"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -440,14 +466,14 @@ export default function GiftViewClient({
             )}
           </button>
 
-          {/* Backsound label */}
           {/* Backsound label removed */}
-        </motion.div>
+          </motion.div>
+        )}
 
         {/* ── Cassette Case with photo slideshow ───────────────── */}
         <motion.div
           className="w-full"
-          style={{ marginTop: 24 }}
+          style={{ marginTop: 8 }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: "easeOut", delay: 0.5 }}
@@ -460,6 +486,8 @@ export default function GiftViewClient({
           />
         </motion.div>
 
+        {/* ── Removed Optional Music Card from bottom ── */}
+        
         <div style={{ height: "20vh", minHeight: "150px" }} aria-hidden="true" />
         </div>
       </div>

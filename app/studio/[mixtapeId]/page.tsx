@@ -46,6 +46,8 @@ interface LibMusic {
 interface UplMusic {
   url: string | null;
   title: string;
+  artist: string;
+  coverUrl: string | null;
 }
 
 interface VoiceNote {
@@ -308,7 +310,7 @@ export default function StudioPage() {
     voiceNote: { url: null, duration: null, mimeType: null },
     musicMode: "library",
     libMusic: { url: null, title: "", artist: "", coverUrl: null },
-    uplMusic: { url: null, title: "" },
+    uplMusic: { url: null, title: "", artist: "", coverUrl: null },
     voiceVolume: 1.0,
     ambientVolume: 0.25,
     password: "",
@@ -367,11 +369,13 @@ export default function StudioPage() {
               url: data.backsound?.url || null,
               title: data.backsound?.title || "",
               artist: data.backsound?.artist || "",
-              coverUrl: null,
+              coverUrl: data.backsound?.coverUrl || null,
             },
             uplMusic: {
               url: data.backsound?.artist ? null : (data.backsound?.url || null),
               title: data.backsound?.artist ? "" : (data.backsound?.title || ""),
+              artist: data.backsound?.artist ? "" : (data.backsound?.artist || ""),
+              coverUrl: data.backsound?.artist ? null : (data.backsound?.coverUrl || null),
             },
             voiceVolume: data.voiceVolume ?? 1.0,
             ambientVolume: data.ambientVolume ?? 0.25,
@@ -782,13 +786,31 @@ export default function StudioPage() {
       if (!result.success) throw new Error();
       update({
         musicMode: "upload",
-        uplMusic: { url: result.url, title: file.name.replace(/\.[^/.]+$/, "") },
+        uplMusic: { url: result.url, title: file.name.replace(/\.[^/.]+$/, ""), artist: "Unknown Artist", coverUrl: null },
       });
       showToast("Music uploaded! 🎶");
     } catch {
       showToast("Upload failed. Try again.");
     } finally {
       setMusicUploading(false);
+    }
+  };
+
+  const handleCoverUpload = async (file: File) => {
+    if (file.size > 5 * 1024 * 1024) { showToast("Image too large. Max 5MB."); return; }
+    showToast("Uploading cover... 🖼️");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const result = await res.json();
+      if (!result.success) throw new Error();
+      update({
+        uplMusic: { ...st.uplMusic, coverUrl: result.url },
+      });
+      showToast("Cover uploaded! 🖼️");
+    } catch {
+      showToast("Upload failed. Try again.");
     }
   };
 
@@ -863,7 +885,8 @@ export default function StudioPage() {
         backsound: {
           url: ambientUrl,
           title: st.musicMode === "library" ? st.libMusic.title : st.uplMusic.title,
-          artist: st.libMusic.artist,
+          artist: st.musicMode === "library" ? st.libMusic.artist : st.uplMusic.artist,
+          coverUrl: st.musicMode === "library" ? st.libMusic.coverUrl : st.uplMusic.coverUrl,
         },
         voiceVolume: st.voiceVolume,
         ambientVolume: st.ambientVolume,
@@ -1308,20 +1331,78 @@ export default function StudioPage() {
                     <p className="text-xs text-black/40" style={{ fontFamily: "var(--font-space-mono)" }}>Uploading music...</p>
                   </div>
                 ) : st.uplMusic.url ? (
-                  <div className="flex items-center gap-3 p-3 rounded-xl border border-black/10 bg-white/60 mb-3">
-                    <span className="text-xl">🎵</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold truncate">{st.uplMusic.title || "Uploaded Song"}</p>
+                  <div className="flex flex-col gap-4 bg-white/60 p-4 rounded-xl border border-black/10 mb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xl">🎵</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold truncate">{st.uplMusic.title || "Uploaded Song"}</p>
+                      </div>
+                      <audio controls src={st.uplMusic.url} className="hidden" id="upl-audio-preview" />
+                      <button
+                        onClick={() => update({ uplMusic: { url: null, title: "", artist: "", coverUrl: null } })}
+                        className="text-[10px] text-red-500 font-bold uppercase tracking-widest"
+                        style={{ fontFamily: "var(--font-space-mono)" }}
+                      >
+                        Remove
+                      </button>
                     </div>
-                    <audio controls src={st.uplMusic.url} className="hidden" id="upl-audio-preview" />
-                    <button
-                      onClick={() => update({ uplMusic: { url: null, title: "" } })}
-                      className="text-xs text-red-400 font-bold"
-                    >
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M1 1l8 8M9 1L1 9" stroke="#f87171" strokeWidth="1.8" strokeLinecap="round"/>
-                      </svg>
-                    </button>
+                    
+                    <div className="h-px w-full bg-black/5" />
+
+                    <div className="flex flex-col gap-3">
+                      <div>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-black/40 mb-1 block" style={{ fontFamily: "var(--font-space-mono)" }}>Song Title</label>
+                        <input
+                          type="text"
+                          value={st.uplMusic.title}
+                          onChange={(e) => update({ uplMusic: { ...st.uplMusic, title: e.target.value } })}
+                          className="w-full bg-white/80 border border-black/10 rounded-lg px-3 py-2 text-xs outline-none focus:border-black/30 transition-colors"
+                          placeholder="e.g. My Favorite Song"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-black/40 mb-1 block" style={{ fontFamily: "var(--font-space-mono)" }}>Artist Name</label>
+                        <input
+                          type="text"
+                          value={st.uplMusic.artist}
+                          onChange={(e) => update({ uplMusic: { ...st.uplMusic, artist: e.target.value } })}
+                          className="w-full bg-white/80 border border-black/10 rounded-lg px-3 py-2 text-xs outline-none focus:border-black/30 transition-colors"
+                          placeholder="e.g. John Doe"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-black/40 mb-1 block" style={{ fontFamily: "var(--font-space-mono)" }}>Album Cover (Optional)</label>
+                        <div className="flex items-center gap-3">
+                          {st.uplMusic.coverUrl ? (
+                            <div className="relative w-12 h-12 rounded-md overflow-hidden group border border-black/10">
+                              <img src={st.uplMusic.coverUrl} alt="Cover" className="w-full h-full object-cover" />
+                              <button 
+                                onClick={() => update({ uplMusic: { ...st.uplMusic, coverUrl: null } })}
+                                className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-[10px] font-bold"
+                              >
+                                X
+                              </button>
+                            </div>
+                          ) : (
+                            <label className="w-12 h-12 rounded-md border-2 border-dashed border-black/20 flex items-center justify-center cursor-pointer hover:border-black/40 transition-colors bg-white/50">
+                              <span className="text-lg text-black/30">+</span>
+                              <input 
+                                type="file" 
+                                accept="image/*" 
+                                className="hidden" 
+                                onChange={(e) => {
+                                  if (e.target.files?.[0]) handleCoverUpload(e.target.files[0]);
+                                  e.target.value = "";
+                                }}
+                              />
+                            </label>
+                          )}
+                          <span className="text-[10px] text-black/40" style={{ fontFamily: "var(--font-space-mono)" }}>
+                            Square image recommended
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div
