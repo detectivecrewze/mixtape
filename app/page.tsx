@@ -241,7 +241,7 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6, ease: "easeOut" }}
-          className="z-20 relative mt-12 sm:mt-16"
+          className="z-20 relative mt-12 sm:mt-16 hidden"
         >
           <button
             id="create-mixtape-btn"
