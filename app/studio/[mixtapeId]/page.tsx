@@ -66,6 +66,8 @@ interface StudioState {
   ambientVolume: number;
   password: string;
   passwordHint: string;
+  studioPassword: string;
+  studioPasswordHint: string;
 }
 
 type VoiceState = "idle" | "requesting" | "recording" | "preview" | "saved";
@@ -296,6 +298,9 @@ export default function StudioPage() {
   // ── Main state ──────────────────────────────────────────────────────────────
   const [isInitializing, setIsInitializing] = useState(true);
   const [isNotFound, setIsNotFound] = useState(false);
+  const [isStudioUnlocked, setIsStudioUnlocked] = useState(true);
+  const [studioPasswordInput, setStudioPasswordInput] = useState("");
+  const [studioPasswordError, setStudioPasswordError] = useState(false);
   const [st, setSt] = useState<StudioState>({
     color: CASSETTE_COLORS[0].hex,
     photos: [],
@@ -308,6 +313,8 @@ export default function StudioPage() {
     ambientVolume: 0.25,
     password: "",
     passwordHint: "",
+    studioPassword: "",
+    studioPasswordHint: "",
   });
 
   const downloadQRCode = useCallback(async () => {
@@ -370,7 +377,17 @@ export default function StudioPage() {
             ambientVolume: data.ambientVolume ?? 0.25,
             password: data.password || "",
             passwordHint: data.passwordHint || "",
+            studioPassword: data.studioPassword || "",
+            studioPasswordHint: data.studioPasswordHint || "",
           });
+          
+          if (data.studioPassword) {
+            let unlocked = false;
+            if (bundleToken && data.bundleToken && bundleToken.toUpperCase() === data.bundleToken) {
+              unlocked = true;
+            }
+            setIsStudioUnlocked(unlocked);
+          }
           
           if (data.voiceNote?.url) {
             setVoiceState("saved");
@@ -457,6 +474,8 @@ export default function StudioPage() {
             ambientVolume: state.ambientVolume,
             password: state.password || null,
             passwordHint: state.passwordHint,
+            studioPassword: state.studioPassword || null,
+            studioPasswordHint: state.studioPasswordHint,
           };
           await fetch(`/api/autosave?id=${mixtapeId}`, {
             method: "POST",
@@ -850,6 +869,8 @@ export default function StudioPage() {
         ambientVolume: st.ambientVolume,
         password: st.password || null,
         passwordHint: st.passwordHint,
+        studioPassword: st.studioPassword || null,
+        studioPasswordHint: st.studioPasswordHint,
         status: "published",
         publishedAt: new Date().toISOString(),
       };
@@ -1401,45 +1422,80 @@ export default function StudioPage() {
       // ── Step 6: Password ───────────────────────────────────────────────────
       case 6:
         return (
-          <motion.div key="s6" {...slideAnim}>
-            <StepTitle>Protect Your Gift</StepTitle>
-            <p className="text-center text-xs text-black/40 mb-5" style={{ fontFamily: "var(--font-space-mono)" }}>
-              Add a password so only they can open it<br />
+          <motion.div key="s6" {...slideAnim} className="max-h-[60vh] overflow-y-auto px-1 -mx-1 scrollbar-hide">
+            <StepTitle style={{ marginBottom: 12 }}>Privacy & Security</StepTitle>
+            <p className="text-center text-xs text-black/40 mb-6" style={{ fontFamily: "var(--font-space-mono)" }}>
+              Protect your mixtape and this studio editor.<br />
               <span className="font-bold opacity-70 text-black/70">(Optional — leave blank to skip)</span>
             </p>
 
-            <div className="space-y-3">
-              <div>
-                <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/40 block mb-1" style={{ fontFamily: "var(--font-space-mono)" }}>
-                  Hint (shown on password screen)
-                </label>
-                <input
-                  type="text"
-                  value={st.passwordHint}
-                  onChange={(e) => update({ passwordHint: e.target.value })}
-                  placeholder="e.g. My favorite food"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-black/15 text-sm outline-none focus:border-black/40 transition-colors"
-                />
+            <div className="space-y-6 pb-4">
+              {/* Gift Password Section */}
+              <div className="p-4 bg-white/40 border border-black/5 rounded-2xl">
+                <div className="flex items-center gap-2 mb-4 text-black/70 font-bold uppercase tracking-widest text-[10px]" style={{ fontFamily: "var(--font-space-mono)" }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  1. Gift Password
+                </div>
+                <p className="text-[10px] text-black/40 mb-4 leading-relaxed mt-1" style={{ fontFamily: "var(--font-space-mono)" }}>
+                  Add a password so only your special someone can open the final gift link.
+                </p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/40 block mb-1" style={{ fontFamily: "var(--font-space-mono)" }}>
+                      Hint (shown on screen)
+                    </label>
+                    <input
+                      type="text"
+                      value={st.passwordHint}
+                      onChange={(e) => update({ passwordHint: e.target.value })}
+                      placeholder="e.g. My favorite food"
+                      className="w-full px-3 py-2.5 rounded-xl bg-white border border-black/10 text-sm outline-none focus:border-black/30 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/40 block mb-1" style={{ fontFamily: "var(--font-space-mono)" }}>
+                      Password
+                    </label>
+                    <input
+                      type="password"
+                      value={st.password}
+                      onChange={(e) => update({ password: e.target.value.replace(/\s/g, "") })}
+                      placeholder="e.g. sushi"
+                      className="w-full px-3 py-2.5 rounded-xl bg-white border border-black/10 text-sm outline-none focus:border-black/30 transition-colors"
+                      style={{ fontFamily: "var(--font-space-mono)", letterSpacing: st.password ? "0.2em" : "normal" }}
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/40 block mb-1" style={{ fontFamily: "var(--font-space-mono)" }}>
-                  Password
-                </label>
-                <input
-                  type="password"
-                  value={st.password}
-                  onChange={(e) => update({ password: e.target.value.replace(/\s/g, "") })}
-                  placeholder="e.g. sushi"
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-black/15 text-sm outline-none focus:border-black/40 transition-colors"
-                  style={{ fontFamily: "var(--font-space-mono)", letterSpacing: st.password ? "0.2em" : "normal" }}
-                />
-              </div>
-            </div>
 
-            <div className="mt-5 p-3 rounded-xl bg-white/50 border border-black/10 text-center">
-              <p className="text-xs text-black/40" style={{ fontFamily: "var(--font-space-mono)" }}>
-                {st.password ? `Password set: "${st.password}"` : "No password — anyone with the link can open it"}
-              </p>
+              {/* Studio Password Section */}
+              <div className="p-4 bg-white/40 border border-black/5 rounded-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2 text-red-500/80 font-bold uppercase tracking-widest text-[10px]" style={{ fontFamily: "var(--font-space-mono)" }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    2. Studio Privacy Lock
+                  </div>
+                </div>
+                <p className="text-[10px] text-black/50 mb-4 leading-relaxed mt-1" style={{ fontFamily: "var(--font-space-mono)" }}>
+                  <strong className="text-red-500/70">Warning:</strong> Set a password to prevent anyone else (including the link provider) from opening this Studio Editor. If you forget this, you will be permanently locked out.
+                </p>
+                <div className="space-y-3 relative z-10">
+                  <div>
+                    <label className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/40 block mb-1" style={{ fontFamily: "var(--font-space-mono)" }}>
+                      Studio Password
+                    </label>
+                    <input
+                      type="password"
+                      value={st.studioPassword}
+                      onChange={(e) => update({ studioPassword: e.target.value.replace(/\s/g, "") })}
+                      placeholder="Leave blank to skip"
+                      className="w-full px-3 py-2.5 rounded-xl bg-white border border-black/10 text-sm outline-none focus:border-red-500/30 transition-colors"
+                      style={{ fontFamily: "var(--font-space-mono)", letterSpacing: st.studioPassword ? "0.2em" : "normal" }}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         );
@@ -1774,6 +1830,63 @@ export default function StudioPage() {
         >
           Go to Homepage
         </a>
+      </main>
+    );
+  }
+
+  if (!isStudioUnlocked) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: bgColor, transition: "background 0.5s ease" }}>
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="w-full max-w-sm bg-white/60 backdrop-blur-xl px-8 py-12 rounded-3xl border border-white/60 shadow-xl"
+        >
+          <div className="flex justify-center mb-6">
+            <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center text-red-500">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+          </div>
+          <h2 className="text-xl font-black text-center mb-2 tracking-tight text-black">Locked Studio</h2>
+          <p className="text-sm text-center text-black/50 mb-8" style={{ fontFamily: "var(--font-space-mono)" }}>
+            This studio editor is protected. Please enter the password to edit this mixtape.
+          </p>
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (studioPasswordInput === st.studioPassword) {
+              setIsStudioUnlocked(true);
+            } else {
+              setStudioPasswordError(true);
+              setTimeout(() => setStudioPasswordError(false), 2000);
+            }
+          }}>
+            <div className="mb-4 relative">
+              <input
+                type="password"
+                value={studioPasswordInput}
+                onChange={(e) => setStudioPasswordInput(e.target.value.replace(/\s/g, ""))}
+                placeholder="Enter password"
+                className={`w-full px-4 py-4 rounded-xl bg-white border ${studioPasswordError ? 'border-red-500 text-red-500' : 'border-black/10 text-black'} text-sm outline-none focus:border-black/30 transition-all font-bold tracking-[0.2em] text-center`}
+                style={{ fontFamily: "var(--font-space-mono)" }}
+              />
+              <AnimatePresence>
+                {studioPasswordError && (
+                  <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} className="absolute right-4 top-1/2 -translate-y-1/2 text-red-500 pointer-events-none">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+            <button
+              type="submit"
+              disabled={!studioPasswordInput}
+              className="w-full py-3 rounded-xl font-bold text-xs tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
+              style={{ fontFamily: "var(--font-space-mono)", background: "#111", color: "white" }}
+            >
+              Unlock Studio
+            </button>
+          </form>
+        </motion.div>
       </main>
     );
   }
