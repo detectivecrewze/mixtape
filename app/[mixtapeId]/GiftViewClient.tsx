@@ -354,9 +354,11 @@ export default function GiftViewClient({
             transition={{ duration: 0.5, ease: "easeOut", delay: 0.12 }}
             style={{ marginBottom: "-0.5rem" }} // Pull cassette up to overlap
           >
-            <div style={{ width: "100%", maxWidth: 290 }}>
-              <NoteCard value={activeConfig.note} readOnly={true} />
-            </div>
+            <motion.div animate={{ y: [0, -6, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}>
+              <div style={{ width: "100%", maxWidth: 290 }}>
+                <NoteCard value={activeConfig.note} readOnly={true} />
+              </div>
+            </motion.div>
           </motion.div>
         )}
 
@@ -367,11 +369,13 @@ export default function GiftViewClient({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: "easeOut", delay: 0.15 }}
         >
-          <CassettePlayer
-            color={activeConfig.color}
-            isPlaying={isPlaying}
-            size="md"
-          />
+          <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}>
+            <CassettePlayer
+              color={activeConfig.color}
+              isPlaying={isPlaying}
+              size="md"
+            />
+          </motion.div>
         </motion.div>
 
         {/* ── Play / Pause button ───────────────────────────────── */}
