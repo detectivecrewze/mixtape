@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import CassettePlayer from "@/components/mixtape/CassettePlayer";
 import NoteCard from "@/components/mixtape/NoteCard";
 import { CASSETTE_COLORS, PASTEL_MAP, type CassetteColorId } from "@/lib/constants";
-import { QRCodeCanvas } from "qrcode.react";
+import HeartQRCode from "@/components/mixtape/HeartQRCode";
 import * as htmlToImage from "html-to-image";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -1664,20 +1664,12 @@ export default function StudioPage() {
                   </p>
                 </div>
 
-                {/* 3. Aesthetic Barcode */}
-                <div className="bg-white p-3 rounded-2xl shadow-sm border border-black/5 mb-2">
-                  <QRCodeCanvas
-                    value={giftUrl || "https://for-you-always.my.id"}
-                    size={120}
-                    bgColor={"#ffffff"}
-                    fgColor={st.color || "#000000"} 
-                    level={"H"}
-                    imageSettings={{
-                      src: "/assets/cassete.png",
-                      height: 24,
-                      width: 36,
-                      excavate: true,
-                    }}
+                {/* 3. Heart QR Code */}
+                <div className="flex items-center justify-center mb-2">
+                  <HeartQRCode
+                    url={giftUrl || "https://for-you-always.my.id"}
+                    color={st.color || "#000000"}
+                    size={150}
                   />
                 </div>
               </div>
