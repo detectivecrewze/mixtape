@@ -326,13 +326,34 @@ export default function StudioPage() {
     }
     try {
       const bgColor = PASTEL_MAP[getColorId(st.color)] || "#f3f4f6";
-      const pngUrl = await htmlToImage.toPng(qrRef.current, { 
-        pixelRatio: 2,
-        backgroundColor: bgColor, // Force the pastel background behind the glassmorphism
+      const pngUrl = await htmlToImage.toPng(qrRef.current, {
+        pixelRatio: 3,
+        backgroundColor: bgColor,
       });
+
+      const fileName = `${mixtapeId}-gift-card.png`;
+
+      // Try Web Share API (works on mobile iOS/Android)
+      if (navigator.share && navigator.canShare) {
+        try {
+          const blob = await (await fetch(pngUrl)).blob();
+          const file = new File([blob], fileName, { type: "image/png" });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: "My Mixtape Gift Card",
+              files: [file],
+            });
+            return;
+          }
+        } catch {
+          // Share failed or cancelled, fall through to download
+        }
+      }
+
+      // Fallback: standard anchor download (desktop + Android Chrome)
       const downloadLink = document.createElement("a");
       downloadLink.href = pngUrl;
-      downloadLink.download = `${mixtapeId}-gift-card.png`;
+      downloadLink.download = fileName;
       document.body.appendChild(downloadLink);
       downloadLink.click();
       document.body.removeChild(downloadLink);
@@ -1648,38 +1669,39 @@ export default function StudioPage() {
                 className="p-8 flex flex-col items-center justify-center w-full max-w-[320px]"
                 style={{ backgroundColor: PASTEL_MAP[getColorId(st.color)] || "#f3f4f6" }}
               >
-                <div className="w-full p-8 rounded-[2rem] flex flex-col items-center justify-center gap-6 bg-white/60 backdrop-blur-xl shadow-2xl border border-white/60">
-                  {/* 1. Cassette Graphic */}
-                  <div className="transform scale-90 sm:scale-100 mt-2">
-                    <CassettePlayer color={st.color} isPlaying={false} size="sm" className="drop-shadow-xl" />
+              <div className="w-full p-8 rounded-[2rem] flex flex-col items-center justify-center gap-5 bg-white/60 backdrop-blur-xl shadow-2xl border border-white/60">
+                  {/* Text */}
+                  <div className="text-center w-full mt-2">
+                    <h3 className="text-sm font-bold tracking-widest text-black/80 uppercase" style={{ fontFamily: "var(--font-space-mono)" }}>
+                      A Mixtape For You
+                    </h3>
+                    <p className="text-[10px] uppercase tracking-wider text-black/50 mt-1 font-bold">
+                      Scan to listen
+                    </p>
                   </div>
-                  
-                  {/* 2. Text */}
-                  <div className="text-center w-full">
-                  <h3 className="text-sm font-bold tracking-widest text-black/80 uppercase" style={{ fontFamily: "var(--font-space-mono)" }}>
-                    A Mixtape For You
-                  </h3>
-                  <p className="text-[10px] uppercase tracking-wider text-black/50 mt-1 font-bold">
-                    Scan to listen
-                  </p>
-                </div>
 
-                {/* 3. Heart QR Code */}
-                <div className="flex items-center justify-center mb-2">
-                  <HeartQRCode
-                    url={giftUrl || "https://for-you-always.my.id"}
-                    color={st.color || "#000000"}
-                    size={150}
-                  />
+                  {/* Heart QR Code */}
+                  <div className="flex items-center justify-center mb-2">
+                    <HeartQRCode
+                      url={giftUrl || "https://for-you-always.my.id"}
+                      color={st.color || "#000000"}
+                      bgColor="#ffffff"
+                      size={200}
+                    />
+                  </div>
                 </div>
               </div>
-              </div>
 
-              {/* Download Button */}
+              {/* Download / Share Button */}
               <button
                 onClick={downloadQRCode}
-                className="text-xs font-bold uppercase tracking-wider text-black/50 hover:text-black transition-colors flex items-center gap-2 mt-2"
-                style={{ fontFamily: "var(--font-space-mono)" }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all active:scale-95 hover:scale-105 mt-2"
+                style={{
+                  fontFamily: "var(--font-space-mono)",
+                  background: st.color || "#111",
+                  color: "#fff",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
