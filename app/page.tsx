@@ -41,113 +41,152 @@ function TokenModal({ onClose }: { onClose: () => void }) {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)" }}
+      style={{ background: "rgba(0,0,0,0.35)", backdropFilter: "blur(8px)" }}
       onClick={onClose}
     >
       <motion.div
-        initial={{ y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: 40, opacity: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="w-full max-w-sm rounded-3xl p-8 flex flex-col gap-5"
+        initial={{ y: 32, opacity: 0, scale: 0.97 }}
+        animate={{ y: 0, opacity: 1, scale: 1 }}
+        exit={{ y: 32, opacity: 0, scale: 0.97 }}
+        transition={{ duration: 0.35, ease: [0.32, 0.72, 0, 1] }}
+        className="w-full max-w-sm flex flex-col gap-6"
         style={{
-          background: "rgba(255,255,255,0.7)",
-          backdropFilter: "blur(30px)",
-          WebkitBackdropFilter: "blur(30px)",
-          border: "1px solid rgba(255,255,255,0.9)",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.12)",
+          background: "rgba(255,255,255,0.82)",
+          backdropFilter: "blur(40px)",
+          WebkitBackdropFilter: "blur(40px)",
+          border: "1px solid rgba(255,255,255,0.95)",
+          boxShadow: "0 32px 80px rgba(0,0,0,0.14), 0 4px 24px rgba(0,0,0,0.08)",
+          borderRadius: "28px",
+          padding: "36px 32px 28px",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="text-center">
+        <div className="text-center flex flex-col items-center gap-2">
+          {/* Icon */}
+          <div
+            className="w-12 h-12 rounded-2xl flex items-center justify-center mb-1"
+            style={{ background: "rgba(0,0,0,0.05)" }}
+          >
+            <span style={{ fontSize: "22px" }}>🎁</span>
+          </div>
           <p
-            className="text-[10px] uppercase tracking-[0.3em] text-black/40 mb-2"
-            style={{ fontFamily: "var(--font-space-mono)" }}
+            className="text-[9px] uppercase tracking-[0.35em]"
+            style={{ fontFamily: "var(--font-space-mono)", color: "rgba(0,0,0,0.35)" }}
           >
             mixtape bundle
           </p>
           <h2
-            className="text-xl font-bold text-black/80"
-            style={{ fontFamily: "var(--font-space-mono)" }}
+            className="text-[22px] font-bold leading-tight"
+            style={{ fontFamily: "var(--font-space-mono)", color: "#0d0d0d", letterSpacing: "-0.01em" }}
           >
             Enter Your Bundle Code
           </h2>
           <p
-            className="text-xs text-black/40 mt-2"
-            style={{ fontFamily: "var(--font-space-mono)" }}
+            className="text-[11px] leading-relaxed"
+            style={{ fontFamily: "var(--font-space-mono)", color: "rgba(0,0,0,0.38)" }}
           >
             Got a bundle? Enter your code to access your mixtape slots.
           </p>
         </div>
 
-        {/* Input */}
+        {/* Input + Button */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            type="text"
-            value={tokenInput}
-            onChange={(e) => {
-              setTokenInput(e.target.value.toUpperCase());
-              setStatus("idle");
-              setErrorMsg("");
-            }}
-            placeholder="e.g. LOVE-A1B2"
-            autoFocus
-            className="w-full px-4 py-3.5 rounded-2xl text-sm font-bold text-center tracking-widest outline-none transition-all"
-            style={{
-              fontFamily: "var(--font-space-mono)",
-              background: "rgba(0,0,0,0.05)",
-              border: status === "error" ? "1.5px solid rgba(220,50,50,0.4)" : "1.5px solid rgba(0,0,0,0.08)",
-              color: "#0d0d0d",
-            }}
-          />
+          <div style={{ position: "relative" }}>
+            <input
+              type="text"
+              value={tokenInput}
+              onChange={(e) => {
+                setTokenInput(e.target.value.toUpperCase());
+                setStatus("idle");
+                setErrorMsg("");
+              }}
+              placeholder="e.g. LOVE-A1B2"
+              autoFocus
+              className="w-full text-sm font-bold text-center tracking-widest outline-none transition-all"
+              style={{
+                fontFamily: "var(--font-space-mono)",
+                background: status === "error" ? "rgba(220,50,50,0.04)" : "rgba(0,0,0,0.04)",
+                border: status === "error"
+                  ? "1.5px solid rgba(220,50,50,0.35)"
+                  : tokenInput
+                    ? "1.5px solid rgba(0,0,0,0.2)"
+                    : "1.5px solid rgba(0,0,0,0.08)",
+                borderRadius: "16px",
+                padding: "14px 18px",
+                color: "#0d0d0d",
+                letterSpacing: "0.2em",
+                transition: "border 0.2s ease, background 0.2s ease",
+              }}
+            />
+          </div>
+
           {errorMsg && (
             <motion.p
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="text-xs text-center"
+              className="text-[10px] text-center"
               style={{ fontFamily: "var(--font-space-mono)", color: "#c0392b" }}
             >
               {errorMsg}
             </motion.p>
           )}
+
           <button
             type="submit"
             disabled={status === "loading" || !tokenInput.trim()}
-            className="w-full py-3.5 rounded-2xl text-sm font-bold tracking-wider text-white uppercase transition-all active:scale-95 disabled:opacity-40"
+            className="w-full text-[11px] font-bold tracking-widest text-white uppercase transition-all active:scale-95 disabled:opacity-40 hover:opacity-90"
             style={{
               fontFamily: "var(--font-space-mono)",
-              background: "#0d0d0d",
+              background: "linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)",
+              borderRadius: "14px",
+              padding: "15px 18px",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08)",
+              border: "none",
+              cursor: status === "loading" || !tokenInput.trim() ? "not-allowed" : "pointer",
             }}
           >
             {status === "loading" ? "Checking..." : "Open My Bundle →"}
           </button>
         </form>
 
-        {/* Divider */}
-        <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-black/10" />
-          <span className="text-[10px] text-black/30" style={{ fontFamily: "var(--font-space-mono)" }}>
-            don't have one?
-          </span>
-          <div className="flex-1 h-px bg-black/10" />
+        {/* Divider + Info */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
+            <span
+              className="text-[9px] uppercase tracking-widest"
+              style={{ fontFamily: "var(--font-space-mono)", color: "rgba(0,0,0,0.3)" }}
+            >
+              don&apos;t have one?
+            </span>
+            <div className="flex-1 h-px" style={{ background: "rgba(0,0,0,0.08)" }} />
+          </div>
+
+          <p
+            className="text-center text-[10px] leading-relaxed"
+            style={{ fontFamily: "var(--font-space-mono)", color: "rgba(0,0,0,0.38)" }}
+          >
+            Bundle codes are sent via DM after purchase. 🎁
+          </p>
+
+          <button
+            onClick={onClose}
+            className="text-center text-[10px] transition-all hover:opacity-70"
+            style={{
+              fontFamily: "var(--font-space-mono)",
+              color: "rgba(0,0,0,0.28)",
+              paddingTop: "4px",
+            }}
+          >
+            Close
+          </button>
         </div>
-
-        <p className="text-center text-[11px] text-black/40" style={{ fontFamily: "var(--font-space-mono)" }}>
-          Bundle codes are sent via DM after purchase. 🎁
-        </p>
-
-        <button
-          onClick={onClose}
-          className="text-center text-[11px] text-black/30 hover:text-black/50 transition-colors"
-          style={{ fontFamily: "var(--font-space-mono)" }}
-        >
-          Close
-        </button>
       </motion.div>
     </motion.div>
   );
 }
+
 
 // ── Homepage ───────────────────────────────────────────────────────────────────
 export default function HomePage() {
