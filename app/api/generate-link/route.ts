@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const quota = 3;
+    const body = await req.json().catch(() => ({}));
+    const quota = typeof body.quota === "number" ? body.quota : 1;
 
     // Generate unique token ID
     let id = generateTokenId();
