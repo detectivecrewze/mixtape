@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { putToken, BundleToken, getToken, putMixtape } from "@/lib/kv";
+import { putToken, BundleToken, getToken } from "@/lib/kv";
 import { nanoid } from "nanoid";
 
 function generateTokenId(): string {
@@ -20,33 +20,6 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
     const quota = typeof body.quota === "number" ? body.quota : 1;
-
-    if (quota === 1) {
-      const id = generateTokenId().toLowerCase();
-      await putMixtape(id, {
-        mixtapeId: id,
-        status: 'draft',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-      const domainUrl = "https://mixtape.for-you-always.my.id";
-      const studioUrl = `${domainUrl}/studio/${id}`;
-      const url = `${domainUrl}/${id}`;
-
-      return NextResponse.json({
-        success: true,
-        studioUrl,
-        url,
-        link: url,
-        message: 'Mixtape berhasil dibuat'
-      }, {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      });
-    }
 
     // Generate unique token ID
     let id = generateTokenId();
