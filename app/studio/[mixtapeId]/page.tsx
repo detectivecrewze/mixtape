@@ -25,6 +25,72 @@ function getColorId(hex: string): CassetteColorId {
 const WORKER = "https://valentine-upload.aldoramadhan16.workers.dev";
 const MAX_PHOTOS = 20;
 const TOTAL_STEPS = 7;
+const STUDIO_COPY: [string, string][] = [
+  ['Back', 'Kembali'], ['Next', 'Lanjut'], ['Review', 'Tinjau'], ['Publish', 'Publikasikan'],
+  ['Pick Your Tape Color', 'Pilih Warna Kaset'], ['Add Your Photos', 'Tambahkan Foto'], ['Drop photos here', 'Taruh foto di sini'],
+  ['or tap to select', 'atau ketuk untuk memilih'], ['Uploading...', 'Mengunggah...'], ['Failed', 'Gagal'],
+  ['Add a caption...', 'Tambahkan keterangan...'], ['Add More', 'Tambah Lagi'], ['photos', 'foto'], ['use arrows to reorder', 'gunakan panah untuk mengatur urutan'],
+  ['Write a Little Note', 'Tulis Pesan Singkat'], ['Record Your Voice', 'Rekam Suaramu'],
+  ['Click the mic to record a voice note for your mixtape', 'Klik mikrofon untuk merekam pesan suara untuk mixtape-mu'],
+  ['Or upload an audio file', 'Atau unggah file audio'], ['Upload MP3 / M4A', 'Unggah MP3 / M4A'], ['Please wait...', 'Mohon tunggu...'],
+  ['Recording', 'Merekam'], ['Preview your recording', 'Pratinjau rekamanmu'], ['Re-record', 'Rekam Ulang'], ['Use Recording', 'Gunakan Rekaman'],
+  ['Voice note saved!', 'Pesan suara tersimpan!'], ['Remove voice note', 'Hapus pesan suara'], ['Choose Your Music', 'Pilih Musikmu'],
+  ['Song Library', 'Pustaka Lagu'], ['Upload Your Own', 'Unggah Musik Sendiri'], ['No song selected yet', 'Belum ada lagu dipilih'],
+  ['Choose Song', 'Pilih Lagu'], ['Change Song', 'Ganti Lagu'], ['Uploading music...', 'Mengunggah musik...'],
+  ['Uploaded Song', 'Lagu Terunggah'], ['Remove', 'Hapus'], ['Song Title', 'Judul Lagu'], ['Artist Name', 'Nama Artis'],
+  ['Album Cover (Optional)', 'Sampul Album (Opsional)'], ['Square image recommended', 'Disarankan gambar persegi'], ['Click to upload MP3', 'Klik untuk unggah MP3'],
+  ['Volume Mix', 'Campuran Volume'], ['Voice', 'Suara'], ['Music', 'Musik'], ['Stop Preview', 'Hentikan Pratinjau'], ['Preview Together', 'Pratinjau Bersama'],
+  ['(Optional — your mixtape works without music too)', '(Opsional — mixtape tetap berfungsi tanpa musik)'],
+  ['Privacy & Security', 'Privasi & Keamanan'], ['Protect your mixtape and this studio editor.', 'Lindungi mixtape dan editor studio ini.'],
+  ['(Optional — leave blank to skip)', '(Opsional — kosongkan untuk melewati)'], ['1. Gift Password', '1. Kata Sandi Gift'],
+  ['Add a password so only your special someone can open the final gift link.', 'Tambahkan kata sandi agar hanya orang spesialmu yang dapat membuka link gift.'],
+  ['Hint (shown on screen)', 'Petunjuk (ditampilkan di layar)'], ['Password', 'Kata Sandi'], ['2. Studio Privacy Lock', '2. Kunci Privasi Studio'],
+  ['Warning:', 'Peringatan:'], ['Studio Password', 'Kata Sandi Studio'], ['Ready to Publish!', 'Siap Dipublikasikan!'],
+  ['Color', 'Warna'], ['Photos', 'Foto'], ['Note', 'Pesan'], ['No note', 'Tidak ada pesan'], ['No voice note', 'Tidak ada pesan suara'],
+  ['No music', 'Tidak ada musik'], ['Protected', 'Terlindungi'], ['Open to anyone', 'Terbuka untuk siapa saja'],
+  ['Please add at least 1 photo before publishing', 'Tambahkan minimal 1 foto sebelum mempublikasikan'],
+  ['Your Mixtape is Live!', 'Mixtape-mu Sudah Aktif!'], ['Share this link with someone special:', 'Bagikan link ini kepada orang spesial:'],
+  ['A Mixtape For You', 'Mixtape Untukmu'], ['Scan to listen', 'Pindai untuk mendengarkan'], ['Save Gift Card', 'Simpan Kartu Gift'],
+  ['Copied!', 'Tersalin!'], ['Copy Link', 'Salin Link'], ['View Gift', 'Lihat Gift'], ['Anyone with this link can open the gift view', 'Siapa pun dengan link ini dapat membuka tampilan gift'],
+  ['Loading...', 'Memuat...'], ['Loading Studio...', 'Memuat Studio...'], ['Mixtape Not Found', 'Mixtape Tidak Ditemukan'],
+  ['Go to Homepage', 'Ke Halaman Utama'], ['Locked Studio', 'Studio Terkunci'], ['Unlock Studio', 'Buka Kunci Studio'],
+  ['Create something beautiful', 'Buat sesuatu yang indah'], ['Interface Language', 'Bahasa Antarmuka'], ['Language', 'Bahasa'],
+  ['Add a caption...', 'Tambahkan keterangan...'], ['Enter password', 'Masukkan kata sandi'], ['Leave blank to skip', 'Kosongkan untuk melewati'],
+  ['Saving...', 'Menyimpan...'], ['Element not ready yet', 'Elemen belum siap'], ['Failed to save image:', 'Gagal menyimpan gambar:'],
+  ['Mic access denied. Please allow microphone access.', 'Akses mikrofon ditolak. Izinkan akses mikrofon terlebih dahulu.'],
+  ['Uploading voice note...', 'Mengunggah pesan suara...'], ['Voice note saved! 🎙️', 'Pesan suara tersimpan! 🎙️'],
+  ['Upload failed. Try again.', 'Upload gagal. Coba lagi.'], ['Please upload an audio file (MP3, M4A, etc.)', 'Unggah file audio (MP3, M4A, dan lainnya)'],
+  ['File too large. Max 10MB.', 'File terlalu besar. Maksimal 10MB.'], ['Uploading audio...', 'Mengunggah audio...'],
+  ['Audio added! ✅', 'Audio berhasil ditambahkan! ✅'], ['Uploading music... 🎶', 'Mengunggah musik... 🎶'],
+  ['Music uploaded! 🎶', 'Musik berhasil diunggah! 🎶'], ['Image too large. Max 5MB.', 'Gambar terlalu besar. Maksimal 5MB.'],
+  ['Uploading cover... 🖼️', 'Mengunggah sampul... 🖼️'], ['Cover uploaded! 🖼️', 'Sampul berhasil diunggah! 🖼️'],
+  ['Record your voice note first! 🎙️', 'Rekam pesan suaramu terlebih dahulu! 🎙️'],
+  ['Please add at least 1 photo first! 📸', 'Tambahkan minimal 1 foto terlebih dahulu! 📸'],
+  ['Failed to publish. Please try again.', 'Gagal mempublikasikan. Silakan coba lagi.'],
+  ['Upload failed', 'Upload gagal'], ['Unknown Artist', 'Artis Tidak Diketahui']
+];
+const STUDIO_DICTIONARY = Object.fromEntries(STUDIO_COPY.flatMap(([en, id]) => [[en, { en, id }], [id, { en, id }]]));
+const translateStudioValue = (value: string, locale: 'id' | 'en') => STUDIO_DICTIONARY[value]?.[locale] || value;
+function translateStudioCopy(root: HTMLElement | null, locale: 'id' | 'en') {
+  if (!root) return;
+  const translate = (value: string) => translateStudioValue(value, locale);
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let node: Text | null;
+  while ((node = walker.nextNode() as Text | null)) {
+    const parent = node.parentElement;
+    if (!parent || ['SCRIPT', 'STYLE', 'TEXTAREA', 'INPUT'].includes(parent.tagName) || parent.isContentEditable) continue;
+    const source = node.nodeValue || '';
+    const key = source.replace(/\s+/g, ' ').trim();
+    const translated = translate(key);
+    if (translated !== key) node.nodeValue = source.replace(key, translated);
+  }
+  root.querySelectorAll<HTMLElement>('[placeholder], [title], [aria-label]').forEach((element) => {
+    ['placeholder', 'title', 'aria-label'].forEach((attribute) => {
+      const value = element.getAttribute(attribute);
+      if (value) element.setAttribute(attribute, translate(value));
+    });
+  });
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface PhotoItem {
@@ -295,6 +361,7 @@ export default function StudioPage() {
   const [giftUrl, setGiftUrl] = useState("");
   const [copied, setCopied] = useState(false);
   const [toast, setToast] = useState("");
+  const [interfaceLocale, setInterfaceLocale] = useState<'id' | 'en'>('en');
   const qrRef = useRef<HTMLDivElement>(null);
 
   // ── Main state ──────────────────────────────────────────────────────────────
@@ -319,9 +386,21 @@ export default function StudioPage() {
     studioPasswordHint: "",
   });
 
+  useEffect(() => {
+    try {
+      const savedLocale = localStorage.getItem(`mixtape-studio-locale-${mixtapeId}`);
+      if (savedLocale === 'id' || savedLocale === 'en') setInterfaceLocale(savedLocale);
+    } catch { /* ignore */ }
+  }, [mixtapeId]);
+
+  useEffect(() => {
+    document.documentElement.lang = interfaceLocale;
+    translateStudioCopy(document.body, interfaceLocale);
+  }, [interfaceLocale]);
+
   const downloadQRCode = useCallback(async () => {
     if (!qrRef.current) {
-      alert("Element not ready yet");
+      alert(translateStudioValue("Element not ready yet", interfaceLocale));
       return;
     }
     try {
@@ -359,7 +438,7 @@ export default function StudioPage() {
       document.body.removeChild(downloadLink);
     } catch (err: any) {
       console.error("Failed to generate image", err);
-      alert("Failed to save image: " + err.message);
+      alert(`${translateStudioValue("Failed to save image:", interfaceLocale)} ${err.message}`);
     }
   }, [mixtapeId, st.color]);
 
@@ -466,9 +545,9 @@ export default function StudioPage() {
 
   // ── Toast helper ────────────────────────────────────────────────────────────
   const showToast = useCallback((msg: string, ms = 3000) => {
-    setToast(msg);
+    setToast(translateStudioValue(msg, interfaceLocale));
     setTimeout(() => setToast(""), ms);
-  }, []);
+  }, [interfaceLocale]);
 
   // ── Autosave ────────────────────────────────────────────────────────────────
   const triggerAutosave = useCallback(
@@ -791,7 +870,7 @@ export default function StudioPage() {
       libMusic: { url: song.audioUrl, title: song.title, artist: song.artist, coverUrl: song.coverUrl || null },
     });
     setShowLibrary(false);
-    showToast(`"${song.title}" selected! 🎶`);
+    showToast(interfaceLocale === 'id' ? `"${song.title}" dipilih! 🎶` : `"${song.title}" selected! 🎶`);
   };
 
   const handleMusicUpload = async (file: File) => {
@@ -2011,6 +2090,24 @@ export default function StudioPage() {
       <div className="w-full max-w-[440px]">
         {/* Header */}
         <div className="text-center" style={{ marginBottom: 40 }}>
+          <div className="flex justify-end" style={{ marginBottom: 16 }}>
+            <label className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/55 border border-white/80 text-[10px] font-bold tracking-wider" style={{ fontFamily: "var(--font-space-mono)" }}>
+              <span className="hidden sm:inline">{interfaceLocale === 'id' ? 'Bahasa' : 'Language'}</span>
+              <select
+                value={interfaceLocale}
+                onChange={(event) => {
+                  const nextLocale = event.target.value as 'id' | 'en';
+                  setInterfaceLocale(nextLocale);
+                  try { localStorage.setItem(`mixtape-studio-locale-${mixtapeId}`, nextLocale); } catch { /* ignore */ }
+                }}
+                aria-label="Interface Language"
+                className="bg-transparent outline-none cursor-pointer"
+              >
+                <option value="id">Indonesia</option>
+                <option value="en">English</option>
+              </select>
+            </label>
+          </div>
           <h1
             className="font-bold tracking-[0.25em] uppercase text-xl"
             style={{ fontFamily: "var(--font-space-mono)", marginBottom: 12 }}
